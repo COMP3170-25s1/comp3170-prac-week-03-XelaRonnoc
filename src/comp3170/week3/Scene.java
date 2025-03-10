@@ -17,6 +17,8 @@ import comp3170.GLBuffers;
 import comp3170.Shader;
 import comp3170.ShaderLibrary;
 
+import comp3170.week3.Week3;
+
 public class Scene {
 
 	final private String VERTEX_SHADER = "vertex.glsl";
@@ -87,11 +89,13 @@ public class Scene {
 		shader.setAttribute("a_position", vertexBuffer);
 		shader.setAttribute("a_colour", colourBuffer);
 
+
 		// draw using index buffer
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 		
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glDrawElements(GL_TRIANGLES, indices.length, GL_UNSIGNED_INT, 0);
+
 
 	}
 
@@ -135,6 +139,14 @@ public class Scene {
 	public static Matrix4f rotationMatrix(float angle, Matrix4f dest) {
 
 		// TODO: Your code here
+		
+		// i think this rotates anti clockwise by angle
+		// this is rotating and scaling and not in a consitent way so missing something here
+		dest.m00(angle);
+		dest.m01(angle);
+		dest.m10(angle);
+		dest.m11(-angle);
+
 
 		return dest;
 	}
@@ -152,6 +164,10 @@ public class Scene {
 	public static Matrix4f scaleMatrix(float sx, float sy, Matrix4f dest) {
 
 		// TODO: Your code here
+		dest.identity();
+		
+		dest.m00(sx);
+		dest.m11(sy);
 
 		return dest;
 	}
