@@ -4,6 +4,7 @@ import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.opengl.GL41.*;
 
 import org.joml.Matrix4f;
+import org.joml.Vector4f;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,15 +26,19 @@ public class Week3 implements IWindowListener {
 	
 	final private File DIRECTORY = new File("src/comp3170/week3"); 
 	
-	private int width = 800;
-	private int height = 800;
+	private int width = 1000;
+	private int height = 1000;
+	private Vector4f clearColour = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+	
 	private Scene scene;
+	private long oldTime;
+	
 	Matrix4f modelMatrix;
 	
 	public Week3() throws OpenGLException  {
 		
 		// create window with title, size, and a listener (this)
-		window = new Window("Week 3 prac", width, height, this);
+		Window window = new Window("Week 3", width, height, this);
 		
 		// sets the window as resizable
 		window.setResizable(true);
@@ -46,28 +51,30 @@ public class Week3 implements IWindowListener {
 		
 		new ShaderLibrary(DIRECTORY);
 		// set the background colour to white
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-		shader = ShaderLibrary.instance.compileShader(VERTEX_SHADER, FRAGMENT_SHADER);
+		glClearColor(clearColour.x, clearColour.y, clearColour.z, clearColour.w);
 		
-		modelMatrix = new Matrix4f();
-		
-		// create the scene
 		scene = new Scene();
+		
+		oldTime = System.currentTimeMillis();
 		
 	}
 
 
 	@Override
 	public void draw() {
-
+		update();
         // clear the colour buffer
 		glClear(GL_COLOR_BUFFER_BIT);	
-
-//		shader.setUniform("u_modelMatrix", Scene.translationMatrix(0.2f, 0.1f, modelMatrix));
-		shader.setUniform("u_modelMatrix", Scene.rotationMatrix(0.25f, modelMatrix));
 		scene.draw();
 
 	    
+	}
+	
+	public void update() {
+		long time = System.currentTimeMillis();
+		float deltaTime = (time - oldTime) / 1000f;
+		oldTime = time;
+		scene.update(deltaTime);
 	}
 
 	@Override
