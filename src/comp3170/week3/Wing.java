@@ -40,13 +40,15 @@ public class Wing {
 	private Matrix4f rotMatrix = new Matrix4f();
 	private Matrix4f scalMatrix = new Matrix4f();
 	
-	final private float OFFSETX = 0.0f;
+	final private float OFFSETX = 0.5f;
 	final private float OFFSETY = 0.5f;
 	
 	final private Vector3f OFFSET = new Vector3f(0.25f,0.0f, 0.0f);
-	final private float MOVEMENT_SPEED = 5f;
+	final private float MOVEMENT_SPEED = 0.05f;
 	final private float SCALE_RATE = 2f;
 	final private float ROTATION_RATE = TAU/6; // what is TAU?
+	
+	private float angle = 0;
 	
 	public Wing() {
 		shader = ShaderLibrary.instance.compileShader(VERTEX_SHADER, FRAGMENT_SHADER);
@@ -89,9 +91,9 @@ public class Wing {
 		indexBuffer = GLBuffers.createIndexBuffer(indices);
 		
 		// My Methods
-		translationMatrix(OFFSETX, OFFSETY, transMatrix);
+		translationMatrix(OFFSETX, 0, transMatrix);
 		scaleMatrix(0.1f,0.1f, scalMatrix);
-		rotationMatrix(90, rotMatrix);
+		rotationMatrix(0, rotMatrix);
 		modelMatrix.mul(transMatrix).mul(scalMatrix).mul(rotMatrix); // T R S order
 		
 		// JOML methods
@@ -100,10 +102,14 @@ public class Wing {
 	
 	public void update (float deltaTime) {
 		float movement = MOVEMENT_SPEED * deltaTime;
-		float rotation = ROTATION_RATE * deltaTime;
+		float rotation = ROTATION_RATE  * deltaTime;
+		angle += rotation;
 		
+		modelMatrix.identity();
 		// below is moving in the models y direction only (i.e. its point)
-		modelMatrix.translate(0.0f,movement,0.0f).rotateZ(rotation);
+//		modelMatrix.rotateZ(rotation).translate(0.0f,movement,0.0f);
+		rotationMatrix(angle, rotMatrix);
+		modelMatrix.mul(rotMatrix).mul(transMatrix).mul(scalMatrix);
 	}
 	
 	public void draw() {
@@ -120,6 +126,8 @@ public class Wing {
 	}
 	
 	public static Matrix4f translationMatrix(float tx, float ty, Matrix4f dest) {
+		dest.identity();
+		
 		// clear the matrix to the identity matrix
 		//     [ 1 0 0 tx ]
 		// T = [ 0 1 0 ty ]
@@ -145,7 +153,8 @@ public class Wing {
 	 */
 
 	public static Matrix4f rotationMatrix(float angle, Matrix4f dest) {
-
+		dest.identity();
+		
 		float angleRad = (float) Math.toRadians(angle);
 		dest.m00((float)Math.cos(angleRad));
 		dest.m01((float)Math.sin(angleRad));
@@ -167,6 +176,8 @@ public class Wing {
 	 */
 
 	public static Matrix4f scaleMatrix(float sx, float sy, Matrix4f dest) {
+		dest.identity();
+		
 		dest.m00(sx);
 		dest.m11(sy);
 
